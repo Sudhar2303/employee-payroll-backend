@@ -17,7 +17,7 @@ app.get('/',(request,response)=>
 app.use(express.json())
 app.use(cors(
     {
-        origin: 'http://localhost:5173',
+        origin: 'https://employee-payroll-frontend-six.vercel.app/',
         credentials: true
     }))
 app.use(cookieParser())
