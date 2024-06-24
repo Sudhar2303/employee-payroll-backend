@@ -24,13 +24,14 @@ const getAttendedHoursData = async(request,response)=>
 const postAttendedHours = async(request,response)=>
 {
     const data = request.body
+    console.log(data)
     try
     {
         const existingData  = await salaryDetailsModel.findOne({employeeID: data.employeeID})
         console.log(existingData)
         if(!existingData)
         {
-            const fetchEmployeeData = await EmployeeDetailsModel.findOne({employeeID : data.employeeID})
+            const fetchEmployeeData = await EmployeeDetailsModel.findOne({_id : data.employeeID})
             console.log(fetchEmployeeData)
             if (fetchEmployeeData)
             {
@@ -62,10 +63,11 @@ const postAttendedHours = async(request,response)=>
                 const newData = await salaryDetailsModel(
                     {
                         employeeID:data.employeeID,
-                        perDaySalary: perDaysalary,
+                        employeeName: fetchEmployeeData.employeeName,
+                        perDaySalary: parseFloat(perDaysalary.toFixed(2)),
                         month:data.month ,
                         workingDays: data.workingDays,
-                        salary: (perDaysalary * data.workingDays)
+                        salary: (perDaysalary * data.workingDays).toFixed(2)
                     }
                 )
                 const updateData = await newData.save()
@@ -78,10 +80,10 @@ const postAttendedHours = async(request,response)=>
         }
         else
         {
-            const fetchEmployeeData = await EmployeeDetailsModel.findOne({employeeID : data.employeeID})
+            const fetchEmployeeData = await EmployeeDetailsModel.findOne({ _id : data.employeeID})
             if(fetchEmployeeData)
             {
-                const updateData = await salaryDetailsModel.updateMany({employeeID:data.employeeID},{$set :
+                const updateData = await salaryDetailsModel.updateMany({ _id :data.employeeID},{$set :
                     {
                         month : data.month,
                         workingDays:data.workingDays,

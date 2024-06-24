@@ -5,10 +5,14 @@ const salaryDetailsModel = mongoose.Schema(
     {
         employeeID:
         {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             ref : 'employeeDetails',
             required : true,
             unique : true
+        },
+        employeeName :
+        {
+            type : String
         },
         perDaySalary :
         {
