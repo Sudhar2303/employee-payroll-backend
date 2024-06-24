@@ -26,7 +26,7 @@ const LoginExistingUser = async(request,response)=>
         if(await bcrypt.compare(request.body.password,validUser.password))
         {
             const AUTH_TOKEN = jwt.sign(validUser.emailID,jwt_secret)
-            response.cookie('token',AUTH_TOKEN,{expiresIn: '20m', httpOnly: true,secure: true,sameSite:'lax'})
+            response.cookie('token',AUTH_TOKEN,{expiresIn: '20m', httpOnly: true,secure: true})
             return response.status(201).send({role:validUser.role,token : AUTH_TOKEN})
         }
         else
