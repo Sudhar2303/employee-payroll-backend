@@ -1,6 +1,9 @@
+const { request, response } = require('express')
 const employeeData = require('../data/initialEmployeeData')
 const employeeDetailsModel = require('../models/EmployeeDetailsModel')
 const salaryDetailsModel = require('../models/salaryDetails')
+const jwt = require('jsonwebtoken')
+const JWT_SECRET = process.env.JWT_SECRET
 
 const getEmployeeDetails = async(request,response)=>
 {
@@ -74,62 +77,23 @@ const getTotalEmployeeSalary = async(request,response) =>
     }
 }
 
-
-
-const postAllocatedSalary = async(request,response)=>
+const getAuthenticate = async(request,response)=>
 {
-    const data = request.body
-    try 
+    const token = request.cookies
+    console.log(token)
+    if (token.token != undefined)
     {
-        const existingData = await salaryDetailsModel.findOne({ employeeData : data.employeeData})
-        console.log(existingData)
-        if(!existingData)
+        const decoded = jwt.verify(token.token,JWT_SECRET)
+        const userData = await userModel.findOne({emailID : decoded})
+        if(userData)
         {
-            const fetchEmployeeData = await employeeDetailsModel.findOne({ _id : data.employeeData})
-            console.log(fetchEmployeeData)
-            switch(fetchEmployeeData.grade)
-            {
-                case 1:
-                    perDaysalary = (data.basicPay * (1 + 0.5 + 0.7 + 0.8))/24
-                    break
-                
-                case 2:
-                    perDaysalary = (data.basicPay * (1 + 0.5 + 0.7 + 0.5))/24
-                    break
-
-                case 3:
-                    perDaysalary = (data.basicPay * (1 + 0.6 + 0.4 + 0.5))/24
-                    break
-                
-                case 4:
-                    perDaysalary = (data.basicPay * (1 + 0.4 + 0.5 + 0.3))/24
-                    break
-                
-                case 5:
-                    perDaysalary = (data.basicPay * (1 + 0.3 + 0.4 + 0.3))/24
-                    break
-                default:
-                    return response.status(400).send({message : "The grade is not defined"})
-                    break
-            }
-            console.log(perDaysalary)
-            const newData = new salaryDetailsModel({
-                employeeData : data.employeeData,
-                basicPay : data.basicPay,
-                dailyPay : perDaysalary
-            })
-            const updateData = await newData.save()
-            return response.status(201).send(updateData)
+            return response.status(201).send({message : "Authorized user"})
         }
-        else
-        {
-            return response.status(201).send({message: "The Employee Data already exists"})
-        }
-    } 
-    catch(error)
+    }
+    else
     {
-        return response.status(500).send({message : error.message})
+        return response.status(401).send({message: " Unauthorized Access"})
     }
 }
 
-module.exports = {getEmployeeDetails,postNewEmployee,getTotalEmployeeSalary}
+module.exports = {getEmployeeDetails,postNewEmployee,getTotalEmployeeSalary,getAuthenticate}

@@ -106,6 +106,25 @@ const postAttendedHours = async(request,response)=>
 }
 
 
+const getAuthenticate = async(request,response)=>
+{
+    const token = request.cookies
+    console.log(token)
+    if (token.token != undefined)
+    {
+        const decoded = jwt.verify(token.token,JWT_SECRET)
+        const userData = await userModel.findOne({emailID : decoded})
+        if(userData)
+        {
+            return response.status(201).send({message : "Authorized user"})
+        }
+    }
+    else
+    {
+        return response.status(401).send({message: " Unauthorized Access"})
+    }
+}
+
 const getTotalEmployeeSalary = async(request,response) =>
 {
     try
@@ -133,4 +152,4 @@ const getTotalEmployeeSalary = async(request,response) =>
         return response.status(500).send({message:error.message})
     }
 }
-module.exports = {getAttendedHoursData,postAttendedHours,getTotalEmployeeSalary}
+module.exports = {getAttendedHoursData,postAttendedHours,getTotalEmployeeSalary,getAuthenticate}
