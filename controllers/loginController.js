@@ -30,6 +30,7 @@ const LoginExistingUser = async(request,response)=>
                 expiresIn: '20m',
                  httpOnly: true,
                  secure: true,
+                 sameSite: 'None',
                  path: '/'
                 })
             return response.status(201).send({role:validUser.role,token : AUTH_TOKEN})
