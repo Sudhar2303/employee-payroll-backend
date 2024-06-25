@@ -3,6 +3,7 @@ const employeeData = require('../data/initialEmployeeData')
 const employeeDetailsModel = require('../models/EmployeeDetailsModel')
 const salaryDetailsModel = require('../models/salaryDetails')
 const jwt = require('jsonwebtoken')
+const userModel = require('../models/userModel')
 const JWT_SECRET = process.env.JWT_SECRET
 
 const getEmployeeDetails = async(request,response)=>
@@ -95,5 +96,6 @@ const getAuthenticate = async(request,response)=>
         return response.status(401).send({message: " Unauthorized Access"})
     }
 }
+
 
 module.exports = {getEmployeeDetails,postNewEmployee,getTotalEmployeeSalary,getAuthenticate}
