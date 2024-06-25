@@ -14,14 +14,16 @@ app.get('/',(request,response)=>
 {
     response.status(201).send({message:'the server is runnning successfully'})
 })
-app.use(express.json())
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+
+    
+app.use(cookieParser());
 app.use(cors(
     {
-        origin: '*', 
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        origin: true, 
         credentials: true
-    }))
-app.use(cookieParser())
+    }));
 app.use('/api/v1/login',loginRouter)
 app.use('/api/v1/admin',adminRouter)
 app.use('/api/v1/hr',hrRouter)
