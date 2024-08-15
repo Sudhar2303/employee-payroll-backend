@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const {getAttendedHoursData,postAttendedHours,getTotalEmployeeSalary,getAuthenticate} = require('../controllers/hrController')
-const {verify} = require('../middleware/verify')
+const {hrVerify} = require('../middleware/hrVerify')
 
-router.route('/getAllEmployee').get(verify,getAttendedHoursData)
-router.route('/updateAttendence').post(verify,postAttendedHours)
-router.route('/getTotalSalary').get(verify,getTotalEmployeeSalary)
-router.route('/authenticate').get(verify,getAuthenticate)
+router.route('/getAllEmployee').get(hrVerify,getAttendedHoursData)
+router.route('/updateAttendence').post(hrVerify,postAttendedHours)
+router.route('/getTotalSalary').get(hrVerify,getTotalEmployeeSalary)
+router.route('/authenticate').get(hrVerify,getAuthenticate)
 
 module.exports = router

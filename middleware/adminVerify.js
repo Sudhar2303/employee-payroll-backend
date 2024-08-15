@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/userModel')
 const JWT_SECRET = process.env.JWT_SECRET
-const verify = async(request,response,next)=>
+const adminVerify = async(request,response,next)=>
 {
     const token = request.cookies
     console.log(token)
@@ -11,9 +11,9 @@ const verify = async(request,response,next)=>
         const userData = await userModel.findOne({emailID : decoded})
         if(userData)
         {
-            next()
+            if(userData.role == 'admin')
+                next()
         }
-        
     }
     else
     {
@@ -21,4 +21,4 @@ const verify = async(request,response,next)=>
     }
 }
 
-module.exports = {verify}
+module.exports = {adminVerify}
