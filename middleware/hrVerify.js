@@ -11,8 +11,10 @@ const hrVerify = async(request,response,next)=>
         const userData = await userModel.findOne({emailID : decoded})
         if(userData)
         {
-            if(userData.role == 'HR')
+            if(userData.role == 'hr')
                 next()
+            else
+                response.status(401).send({message:"Unauthorized Access"})
         }
     }
     else

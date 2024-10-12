@@ -49,6 +49,67 @@ const postNewEmployee = async(request,response)=>
     }
 }
 
+const updateExistingEmployee = async(request,response)=>
+{
+    const toUpdateData = request.body;
+    try
+    {
+        const updatedData = await employeeDetailsModel.updateOne({_id:toUpdateData._id},{$set:toUpdateData});
+        if(updatedData)
+        {
+            return response.status(201).send({message:"Successfully updated data"});
+        }
+        else
+        {
+            return response.status(404).send({message:"The Employee Id is not found"});
+        }
+    }
+    catch(error)
+    {
+        return response.status(500).send({message: error.message})
+    }
+
+}
+
+const deleteEmployeeData = async(request,response) =>
+{
+    const toDeleteData = request.body;
+    try
+    {
+        const deletedData = await employeeDetailsModel.deleteOne({_id:toDeleteData._id})
+        if(deletedData)
+            return response.status(201).send({message:"The Data Deleted Successfully"});
+        else
+            return response.status(404).send({message:"The Employee data not found"});
+    }
+    catch(error)
+    {
+        response.status(500).send({message:error.message})
+    }
+}
+
+const getEmployeeCount = async(request,response) =>
+{   
+    try
+    {
+        const totalEmployees = await employeeDetailsModel.countDocuments();
+        const genderCount = await employeeDetailsModel.aggregate([
+            {
+                $group: {
+                    _id: "$gender",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+        const traineeCount = await employeeDetailsModel.countDocuments({ role: "trainee" });
+
+        return response.status(200).send({totalEmployees,genderCount,traineeCount});
+    }
+    catch(error)
+    {
+        return response.status(500).send({message:error.message});
+    }
+}
 
 const getTotalEmployeeSalary = async(request,response) =>
 {
@@ -98,4 +159,4 @@ const getAuthenticate = async(request,response)=>
 }
 
 
-module.exports = {getEmployeeDetails,postNewEmployee,getTotalEmployeeSalary,getAuthenticate}
+module.exports = {getEmployeeDetails,postNewEmployee,getTotalEmployeeSalary,getAuthenticate,updateExistingEmployee,deleteEmployeeData,getEmployeeCount}

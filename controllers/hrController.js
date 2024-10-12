@@ -1,110 +1,77 @@
-const EmployeeDetailsModel = require('../models/EmployeeDetailsModel')
+const employeeDetailsModel = require('../models/EmployeeDetailsModel')
 const salaryDetailsModel = require('../models/salaryDetails')
 
-const getAttendedHoursData = async(request,response)=>
+const getDepartmentViceCount = async(request,response) =>
 {
     try
     {
-        const userData = await salaryDetailsModel.find()
-        if(userData!=0)
-        {
-            return response.status(201).send(userData)
-        }
-        else
-        {
-            return response.status(201).send({message : "the database is empty"})
-        }
-    }
-    catch(error)
-    {
-        return response.status(500).send({message : error.message})
-    }
-}
-
-const postAttendedHours = async(request,response)=>
-{
-    const data = request.body
-    console.log(data)
-    try
-    {
-        const existingData  = await salaryDetailsModel.findOne({employeeID: data.employeeID})
-        console.log(existingData)
-        if(!existingData)
-        {
-            const fetchEmployeeData = await EmployeeDetailsModel.findOne({_id : data.employeeID})
-            console.log(fetchEmployeeData)
-            if (fetchEmployeeData)
+        const departmentEmployeeCount = await employeeDetailsModel.aggregate([
             {
-                switch(fetchEmployeeData.grade)
-                {
-                    case 1:
-                        perDaysalary = (fetchEmployeeData.basicPay * (1 + 0.5 + 0.7 + 0.8))/24
-                        break
-                    
-                    case 2:
-                        perDaysalary = (fetchEmployeeData.basicPay * (1 + 0.5 + 0.7 + 0.5))/24
-                        break
-
-                    case 3:
-                        perDaysalary = (fetchEmployeeData.basicPay * (1 + 0.6 + 0.4 + 0.5))/24
-                        break
-                    
-                    case 4:
-                        perDaysalary = (fetchEmployeeData.basicPay * (1 + 0.4 + 0.5 + 0.3))/24
-                        break
-                    
-                    case 5:
-                        perDaysalary = (fetchEmployeeData.basicPay * (1 + 0.3 + 0.4 + 0.3))/24
-                        break
-                    default:
-                        return response.status(400).send({message : "The grade is not defined"})
+                $group : {
+                    _id : "$role",
+                    count:{$sum:1}
                 }
-                console.log(perDaysalary,data.workingDays)
-                const newData = await salaryDetailsModel(
-                    {
-                        employeeID:data.employeeID,
-                        employeeName: fetchEmployeeData.employeeName,
-                        perDaySalary: parseFloat(perDaysalary.toFixed(2)),
-                        month:data.month ,
-                        workingDays: data.workingDays,
-                        salary: (perDaysalary * data.workingDays).toFixed(2)
-                    }
-                )
-                const updateData = await newData.save()
-                return response.status(201).send(updateData)
             }
-            else
-            {
-                return response.status(201).send({messsage: "The employeeData Not found check the employeeID"})
-            }
-        }
+        ])
+        if(departmentEmployeeCount.length > 0)
+            return response.status(200).send(departmentEmployeeCount)
         else
-        {
-            const fetchEmployeeData = await EmployeeDetailsModel.findOne({ _id : data.employeeID})
-            if(fetchEmployeeData)
-            {
-                const updateData = await salaryDetailsModel.updateMany({ _id :data.employeeID},{$set :
-                    {
-                        month : data.month,
-                        workingDays:data.workingDays,
-                        salary : (existingData.perDaySalary * data.workingDays)
-                    }
-                })
-                return response.status(201).send(updateData)
-            }
-            else
-            {
-                return response.status(201).send({messsage: "The employeeData Not found check the employeeID"})
-            }
-        }
-        
+            return response.status(500).send({message:"The employee details may be null"})
     }
     catch(error)
-    {
-        response.status(500).send({message : error.message})
+    {   
+        return response.status(500).send({message:error.message})
     }
 }
 
+const getAttendenceStatus = async(request,response) =>
+{
+    try
+    {
+        const totalCount = await employeeDetailsModel.aggregate([
+            {
+                $group :
+                {
+                    _id :"$status",
+                    count :{$sum :1}
+                }
+            }
+        ])
+        const departmentCount = await employeeDetailsModel.aggregate([
+            {
+                $group :
+                {
+                    _id : "$role",
+                    onlineCount :{
+                        $sum :
+                        {
+                            $cond :[{ $eq :['$status','online']},1,0]
+                        }
+                    },
+                    offlineCount :{
+                        $sum :
+                        {
+                            $cond :[{ $eq :['$status','offline']},1,0]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,     
+                    role: "$_id", 
+                    onlineCount: 1, 
+                    offlineCount: 1 
+                }
+            }
+        ]);
+        return response.status(200).send({totalCount,departmentCount})
+    }
+    catch(error)
+    {
+        return response.status(500).send({message:error.message})
+    }
+}
 
 const getAuthenticate = async(request,response)=>
 {
@@ -152,4 +119,4 @@ const getTotalEmployeeSalary = async(request,response) =>
         return response.status(500).send({message:error.message})
     }
 }
-module.exports = {getAttendedHoursData,postAttendedHours,getTotalEmployeeSalary,getAuthenticate}
+module.exports = {getTotalEmployeeSalary,getAuthenticate,getDepartmentViceCount,getAttendenceStatus}

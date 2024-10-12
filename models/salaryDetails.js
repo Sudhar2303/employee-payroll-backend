@@ -10,19 +10,15 @@ const salaryDetailsModel = mongoose.Schema(
             required : true,
             unique : true
         },
-        employeeName :
-        {
-            type : String
-        },
-        perDaySalary :
-        {
-            type : Number,
-            default:0
-        },
         month :
         {
             type: String,
             required : true
+        },
+        year :
+        {
+            type: Number,
+            required: true,
         },
         workingDays :
         {
@@ -35,6 +31,11 @@ const salaryDetailsModel = mongoose.Schema(
         {
             type : Number,
             default:0
+        },
+        salarystatus :
+        {
+            type : String,
+            enum :["paid","unpaid"]
         }
     },
     {

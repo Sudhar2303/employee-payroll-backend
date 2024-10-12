@@ -17,7 +17,13 @@ const employeeDetailsModel = mongoose.Schema(
         role:
         {
             type : String,
-            enum : ["Developer", "Manager", "Designer", "Tester"],
+            enum : ["hr","Developer", "Manager", "Designer", "Tester"],
+            required : true
+        },
+        gender :
+        {
+            type : String,
+            enum :["male","female"],
             required : true
         },
         grade :
@@ -31,6 +37,20 @@ const employeeDetailsModel = mongoose.Schema(
         {
             type: Number,
             required : true
+        },
+        status :
+        {
+            type:String,
+            enum:['online','offline'],
+            required:true,
+            default:'offline'
+        },
+        salaryStatus :
+        {
+            type: String,
+            enum: ["paid","unpaid"],
+            required : true,
+            default:"unpaid"
         }
     },
     {

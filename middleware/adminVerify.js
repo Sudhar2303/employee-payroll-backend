@@ -4,7 +4,6 @@ const JWT_SECRET = process.env.JWT_SECRET
 const adminVerify = async(request,response,next)=>
 {
     const token = request.cookies
-    console.log(token)
     if (token.token != undefined)
     {
         const decoded = jwt.verify(token.token,JWT_SECRET)
