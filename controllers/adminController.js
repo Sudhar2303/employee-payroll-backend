@@ -90,9 +90,8 @@ const updateExistingEmployee = async(request,response)=>
 
 const deleteEmployeeData = async(request,response) =>
 {
-    const processEmployeeID = request.body._id
-    const employeeID = request.body.employeeID._id
-    
+    const processEmployeeID = request._id
+    const employeeID = request.employeeID 
     try
     {
         const deletedEmployeeID = await employeeDetailsModel.deleteOne({_id:employeeID})
@@ -154,7 +153,7 @@ const updateGrade = async(request,response) =>
         const existingGrade = await gradeModel.findOne({gradeNo : toUpdateData.gradeNo, active:true})
         if(existingGrade)
         {
-            await gradeModel.findOneAndUpdate({gradeNo : toUpdateData.gradeNo},{active:false})
+            await gradeModel.findOneAndUpdate({gradeNo : toUpdateData.gradeNo,active :true},{active:false})
         }
         toUpdateData.active = true
         const updatedData = await gradeModel.create(toUpdateData)

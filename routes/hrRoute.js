@@ -5,8 +5,8 @@ const {getEmployeeDetails,getEmployeeCount,getGradeData} = require('../controlle
 const {hrVerify} = require('../middleware/hrVerify')
 
 router.route('/getEmployee').get(hrVerify,getEmployeeDetails)
-router.route('/addEmployee').get(hrVerify,postNewEmployee)
-router.route('/updateEmployeeData').get(hrVerify,updateExistingEmployee)
+router.route('/addEmployee').post(hrVerify,postNewEmployee)
+router.route('/updateEmployeeData').post(hrVerify,updateExistingEmployee)
 router.route('/getGrade').get(hrVerify,getGradeData)
 
 router.route('/getDepartmentViceCount').get(hrVerify,getDepartmentViceCount)
