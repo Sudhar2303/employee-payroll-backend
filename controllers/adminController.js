@@ -90,8 +90,9 @@ const updateExistingEmployee = async(request,response)=>
 
 const deleteEmployeeData = async(request,response) =>
 {
-    const processEmployeeID = request._id
-    const employeeID = request.employeeID 
+    const processEmployeeID = request.body._id
+    const employeeID = request.body.employeeID._id
+    
     try
     {
         const deletedEmployeeID = await employeeDetailsModel.deleteOne({_id:employeeID})
