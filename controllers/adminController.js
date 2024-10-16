@@ -1,5 +1,5 @@
 const gradeModel = require('../models/gradeModel')
-const employeeDetailsModel = require('../models/employeeDetailsModel')
+const employeeDetailsModel = require('../models/employeeModel')
 const processModel = require('../models/processModel')
 const attendanceLogModel = require('../models/attendanceLogModel')
 const gradeData = require('../data/initialGradeData')

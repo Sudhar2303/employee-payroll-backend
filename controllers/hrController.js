@@ -1,4 +1,4 @@
-const employeeDetailsModel = require('../models/employeeDetailsModel')
+const employeeDetailsModel = require('../models/employeeModel')
 const gradeModel = require('../models/gradeModel')
 const processModel = require('../models/processModel')
 
