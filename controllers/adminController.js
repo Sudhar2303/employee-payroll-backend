@@ -289,7 +289,7 @@ const getAuthenticate = async(request,response)=>
     const token = request.cookies.token
     if (token)
     {
-        const decoded = jwt.verify(token.token,JWT_SECRET)
+        const decoded = jwt.verify(token,JWT_SECRET)
         const userData = await userModel.findOne({emailID : decoded})
         if(userData)
         {
