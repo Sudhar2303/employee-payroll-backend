@@ -54,7 +54,7 @@ const postNewEmployee = async(request,response)=>
         }
         else
         {
-            return response.status(201).send({message : "The employee Id already exists"})
+            return response.status(409).send({message : "The employee Id already exists"})
         }
     }
     catch(error)
@@ -189,7 +189,7 @@ const updatePendingApproval = async(request,response)=>
     const employeeID = request.body.employeeID._id
     try
     {
-        const updatedEmployeeData = await employeeDetailsModel.findOneAndUpdate({_id: employeeID._id},{
+        const updatedEmployeeData = await employeeDetailsModel.findOneAndUpdate({_id: employeeID},{
             approvalStatus : processEmployeeID.approvalStatus
         })
         const UpdatedProcessEmployee = await processModel.findOneAndUpdate({_id:processEmployeeID._id},{
@@ -286,8 +286,8 @@ const getEmployeeCount = async(request,response) =>
 
 const getAuthenticate = async(request,response)=>
 {
-    const token = request.cookies
-    if (token.token != undefined)
+    const token = request.cookies.token
+    if (token)
     {
         const decoded = jwt.verify(token.token,JWT_SECRET)
         const userData = await userModel.findOne({emailID : decoded})
