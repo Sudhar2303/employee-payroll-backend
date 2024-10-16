@@ -12,6 +12,8 @@ const adminVerify = async(request,response,next)=>
         {
             if(userData.role == 'admin')
                 next()
+            else
+                return response.status(401).send({message: " Unauthorized Access"})
         }
     }
     else

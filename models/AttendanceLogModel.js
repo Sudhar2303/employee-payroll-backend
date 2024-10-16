@@ -13,12 +13,11 @@ const attendanceLogSchema = mongoose.Schema(
         },
         endTime: {
             type: Date,
-            required: true
+
         },
         workingHours :
         {
             type: Number,
-            required : true
         }
     },
     {

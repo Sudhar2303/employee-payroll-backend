@@ -3,21 +3,21 @@ const employeeData = require('../data/initialEmployeeData')
 
 const employeeDetailsModel = mongoose.Schema(
     {
-        employeeName:
-        {
-            type : String,
-            required : true
-        },
         employeeID:
         {
             type : String,
             required : true,
             unique : true
         },
+        employeeName:
+        {
+            type : String,
+            required : true
+        },
         role:
         {
             type : String,
-            enum : ["hr","Developer", "Manager", "Designer", "Tester"],
+            enum : ["hr","developer", "manager", "designer", "tester"],
             required : true
         },
         gender :
@@ -26,17 +26,11 @@ const employeeDetailsModel = mongoose.Schema(
             enum :["male","female"],
             required : true
         },
-        grade :
+        emailID :
         {
-            type: Number,
-            required : true,
-            match: [/^[1-5]$/],
-            default : 5
-        },
-        basicPay :
-        {
-            type: Number,
-            required : true
+            type :String,
+            required :  true,
+            unique : true
         },
         status :
         {
@@ -45,16 +39,16 @@ const employeeDetailsModel = mongoose.Schema(
             required:true,
             default:'offline'
         },
-        salaryStatus :
+        approvalStatus :
         {
             type: String,
-            enum: ["paid","unpaid"],
+            enum: ["approved","pending"],
             required : true,
-            default:"unpaid"
+            default:"pending"
         }
     },
     {
-        collections : 'employeeDetails'
+        collection : 'employeeDetails'
     }
 )
 

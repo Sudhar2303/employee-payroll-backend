@@ -1,54 +1,49 @@
 const employeeData = [
     {
-        employeeID: "E001",
-        employeeName: "Alice Johnson",
-        role: "Developer",
-        basicPay: 50000,
-        grade: 4,
-        status: "offline",
-        salaryStatus: "unpaid",
-        gender: "female"
+        employeeID: "E001",              
+        employeeName: "Alice Johnson",    
+        role: "developer",                 
+        gender: "female",                  
+        emailID: "alice.johnson@example.com", 
+        status: "offline",                 
+        approvalStatus: "pending"         
     },
     {
         employeeID: "E002",
         employeeName: "Bob Smith",
-        role: "Manager",
-        basicPay: 70000,
-        grade: 5,
+        role: "manager",
+        gender: "male",
+        emailID: "bob.smith@example.com",
         status: "online",
-        salaryStatus: "paid",
-        gender: "male"
+        approvalStatus: "approved"         
     },
     {
         employeeID: "E003",
         employeeName: "Carol White",
-        role: "Designer",
-        basicPay: 45000,
-        grade: 3,
+        role: "designer",
+        gender: "female",
+        emailID: "carol.white@example.com",
         status: "offline",
-        salaryStatus: "unpaid",
-        gender: "female"
+        approvalStatus: "pending"          
     },
     {
         employeeID: "E004",
         employeeName: "David Brown",
-        role: "Tester",
-        basicPay: 40000,
-        grade: 2,
+        role: "tester",
+        gender: "male",
+        emailID: "david.brown@example.com",
         status: "online",
-        salaryStatus: "paid",
-        gender: "male"
+        approvalStatus: "approved"         
     },
     {
         employeeID: "E005",
         employeeName: "Emma Green",
-        role: "Developer",
-        basicPay: 50000,
-        grade: 4,
+        role: "developer",
+        gender: "female",
+        emailID: "emma.green@example.com",
         status: "offline",
-        salaryStatus: "unpaid",
-        gender: "female"
+        approvalStatus: "pending"          
     }
 ]
 
-module.exports = employeeData
+module.exports = employeeData;

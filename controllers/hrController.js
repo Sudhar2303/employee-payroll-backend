@@ -1,6 +1,59 @@
-const employeeDetailsModel = require('../models/EmployeeDetailsModel')
-const salaryDetailsModel = require('../models/salaryDetails')
+const employeeDetailsModel = require('../models/employeeDetailsModel')
+const gradeModel = require('../models/gradeModel')
+const processModel = require('../models/processModel')
 
+const postNewEmployee = async(request,response)=>
+{
+    const newEmployeeData = request.body.employeeID
+    const gradeNo = request.body.gradeNo.gradeNo
+    const employeeProcessData = request.body
+    try
+    {
+        const existingEmployee = await employeeDetailsModel.findOne({employeeID : newEmployeeData.employeeID})
+        if(!existingEmployee)
+        {
+            const newlyAddedData = await employeeDetailsModel.create(newEmployeeData)
+            const grade = await gradeModel.findOne({gradeNo:gradeNo, active: true})
+            employeeProcessData.employeeID = newlyAddedData._id
+            employeeProcessData.gradeNo = grade._id
+            await processModel.create(employeeProcessData);
+            return response.status(201).send("The Data added SuccessFully")
+        }
+        else
+        {
+            return response.status(201).send({message : "The employee Id already exists"})
+        }
+    }
+    catch(error)
+    {
+        return response.status(500).send({message : error.message})
+    }
+}
+
+const updateExistingEmployee = async(request,response)=>
+{
+    const toUpdateEmployeeData = request.body.employeeID
+    const toUpdategradeNo = request.body.gradeNo.gradeNo
+    const toUpdateEmployeeProcessData = request.body
+    try
+    {
+        const updatedEmployee = await employeeDetailsModel.findOneAndUpdate({employeeID : toUpdateEmployeeData.employeeID},
+            {$set : toUpdateEmployeeData})
+        const grade = await gradeModel.findOne({gradeNo:toUpdategradeNo, active: true})
+        toUpdateEmployeeProcessData.employeeID = toUpdateEmployeeData._id
+        toUpdateEmployeeProcessData.gradeNo = grade._id
+        await processModel.findOneAndUpdate(
+            { _id: toUpdateEmployeeProcessData._id },
+            { $set: toUpdateEmployeeProcessData }
+        );
+        return response.status(201).send("The Data is updated SuccessFully")        
+    }
+    catch(error)
+    {
+        return response.status(500).send({message : error.message})
+    }
+
+}
 const getDepartmentViceCount = async(request,response) =>
 {
     try
@@ -92,31 +145,4 @@ const getAuthenticate = async(request,response)=>
     }
 }
 
-const getTotalEmployeeSalary = async(request,response) =>
-{
-    try
-    {
-        const employeeData = await salaryDetailsModel.find()
-        if(employeeData.length != 0 )
-        {
-            const result = await salaryDetailsModel.aggregate([
-                {
-                    $group: {
-                    _id: null,
-                    totalSalary: { $sum: { $toDouble: "$salary" } }
-                    }
-                }
-                ])
-                return response.status(201).send(result)
-        }
-        else
-        {
-            return response.status(201).send({Message: "the employee salary data is empty"})
-        }
-    }
-    catch(error)
-    {
-        return response.status(500).send({message:error.message})
-    }
-}
-module.exports = {getTotalEmployeeSalary,getAuthenticate,getDepartmentViceCount,getAttendenceStatus}
+module.exports = {getAuthenticate,getDepartmentViceCount,getAttendenceStatus,postNewEmployee,updateExistingEmployee}

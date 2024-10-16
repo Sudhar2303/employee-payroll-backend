@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const jwt_secret = process.env.JWT_SECRET
 
-const LoginExistingUser = async(request,response)=>
+const loginUser = async(request,response)=>
 {
     try
     {
@@ -14,7 +14,6 @@ const LoginExistingUser = async(request,response)=>
             for(let userData of initialUserData)
             {
                 const initialData = await userModel(userData)
-                console.log(initialData)
                 await initialData.save()
             }
         }
@@ -27,7 +26,6 @@ const LoginExistingUser = async(request,response)=>
         {
             const AUTH_TOKEN = jwt.sign(validUser.emailID,jwt_secret)
             response.cookie('token',AUTH_TOKEN,{
-                expiresIn: '20m',
                  httpOnly: true,
                  secure: true,
                  sameSite: 'None',
@@ -46,4 +44,27 @@ const LoginExistingUser = async(request,response)=>
     }
 }
 
-module.exports = {LoginExistingUser}
+const logoutUser = (request,response) =>
+{
+    try
+    {
+        const userCookie = request.cookies
+        if(Object.keys(userCookie).length != 0)
+        {
+            response.clearCookie('token',{
+                httpOnly: true,
+                    secure: true,
+                    sameSite: 'None',
+                    path: '/'
+            })
+            return response.status(201).send({message : "User has been Logout"})
+        }
+        return response.status(401).send({message : "Invalid Operation"})
+    }
+    catch(error)
+    {
+        return response.status(500).send({message : error.message})
+    }
+}
+
+module.exports = {loginUser,logoutUser}

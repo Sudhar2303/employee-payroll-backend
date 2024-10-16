@@ -6,29 +6,29 @@ const cors = require('cors')
 const app = express()
 
 const PORT = process.env.PORT
-const loginRouter = require('./routes/loginRoute')
+const authRoute = require('./routes/authRoute')
 const adminRouter = require('./routes/adminRoute')
 const hrRouter = require('./routes/hrRoute')
-const logoutRoute = require('./routes/logoutRoute')
 
-app.get('/',(request,response)=>
-{
-    response.status(201).send({message:'the server is runnning successfully'})
-})
 app.use(express.json());
 app.use(express.urlencoded({extended:true})); 
 
-    
+
 app.use(cookieParser());
 app.use(cors(
     {
         origin: true, 
         credentials: true
     }));
-app.use('/api/v1/login',loginRouter)
+
+app.get('/',(request,response)=>
+{
+    response.status(201).send({message:'the server is runnning successfully'})
+})
+
+app.use('/api/v1',authRoute)
 app.use('/api/v1/admin',adminRouter)
 app.use('/api/v1/hr',hrRouter)
-app.use('/api/v1/logout',logoutRoute)
 
 mongoose.connect(process.env.DB_URL)
 const db = mongoose.connection
