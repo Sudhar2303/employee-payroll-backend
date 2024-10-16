@@ -90,8 +90,8 @@ const updateExistingEmployee = async(request,response)=>
 
 const deleteEmployeeData = async(request,response) =>
 {
-    const processEmployeeID = request.body._id
-    const employeeID = request.body.employeeID._id
+    const processEmployeeID = request.body.data._id
+    const employeeID = request.body.data.employeeID._id
     
     try
     {
