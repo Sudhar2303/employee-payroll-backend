@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const employeeData = require('../data/initialEmployeeData')
 
 const employeeDetailsModel = mongoose.Schema(
     {
