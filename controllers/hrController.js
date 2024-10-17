@@ -1,6 +1,9 @@
 const employeeDetailsModel = require('../models/employeeModel')
 const gradeModel = require('../models/gradeModel')
 const processModel = require('../models/processModel')
+const jwt = require('jsonwebtoken')
+const userModel = require('../models/userModel')
+const JWT_SECRET = process.env.JWT_SECRET
 
 const postNewEmployee = async(request,response)=>
 {
@@ -128,20 +131,28 @@ const getAttendenceStatus = async(request,response) =>
 
 const getAuthenticate = async(request,response)=>
 {
-    const token = request.cookies.token
-    if (token)
+    try
     {
-        const decoded = jwt.verify(token,JWT_SECRET)
-        const userData = await userModel.findOne({emailID : decoded})
-        if(userData)
+        const token = request.cookies.token
+        if (token)
         {
-            return response.status(201).send({message : "Authorized user"})
+            const decoded = jwt.verify(token,JWT_SECRET)
+            const userData = await userModel.findOne({emailID : decoded})
+            if(userData)
+            {
+                return response.status(201).send({message : "Authorized user"})
+            }
+        }
+        else
+        {
+            return response.status(401).send({message: " Unauthorized Access"})
         }
     }
-    else
+    catch(error)
     {
-        return response.status(401).send({message: " Unauthorized Access"})
+        return response.status(500).send({message:error.message})
     }
+    
 }
 
 module.exports = {getAuthenticate,getDepartmentViceCount,getAttendenceStatus,postNewEmployee,updateExistingEmployee}
