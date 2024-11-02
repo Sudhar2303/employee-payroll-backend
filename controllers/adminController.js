@@ -83,7 +83,6 @@ const postNewEmployee = async(request,response)=>
                         });
                 
                         await user.save();
-                        return response.status(200).send({message : "New user created"})
                     }
                 }
                 catch(error)
