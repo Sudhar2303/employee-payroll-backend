@@ -68,13 +68,7 @@ const postNewEmployee = async(request,response)=>
                             password: request.body.employeeID.employeeName,
                             role: role
                         });
-                
-                        console.log(user.password);     
 
-                        const salt = await bcrypt.genSalt(10);
-                        user.password = await bcrypt.hash(user.password, salt); 
-                        
-                        console.log(user.password);
                         const info = await transport.sendMail({
                             from: "Sudharsanan",
                             to: user.emailID,
