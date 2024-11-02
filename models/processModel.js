@@ -39,6 +39,12 @@ const processModel = mongoose.Schema(
             type : Date,
             default: Date.now 
         },
+        salaryStatus :
+        {
+            type: String,
+            enum :["paid","pending"],
+            default: "pending"
+        },
         approvalStatus :
         {
             type : String,

@@ -45,7 +45,6 @@ const updateExistingEmployee = async(request,response)=>
         const grade = await gradeModel.findOne({gradeNo:toUpdategradeNo, active: true})
         toUpdateEmployeeProcessData.employeeID = toUpdateEmployeeData._id
         toUpdateEmployeeProcessData.gradeNo = grade._id,
-        toUpdateEmployeeProcessData.approvalStatus = "pending"
         await processModel.findOneAndUpdate(
             { _id: toUpdateEmployeeProcessData._id },
             { $set: toUpdateEmployeeProcessData }

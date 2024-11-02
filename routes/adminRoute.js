@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const {getEmployeeDetails,postNewEmployee,getAuthenticate,calculateAndUpdateSalaries
     ,updateExistingEmployee,deleteEmployeeData,getGradeData,updateGrade,addNewGrade,
-    getEmployeeCount,updatePendingApproval, getPendingRequest}  = require('../controllers/adminController')
+    getEmployeeCount,updatePendingApproval, getPendingRequest, updateSalaryStatus,
+    totalSalary,countSalaryStatus}  = require('../controllers/adminController')
 const {getDepartmentViceCount} = require('../controllers/hrController')
 const {adminVerify} = require('../middleware/adminVerify')
 
@@ -18,6 +19,9 @@ router.route('/updateGrade').post(adminVerify,updateGrade)
 router.route('/salary').get(adminVerify,calculateAndUpdateSalaries)
 router.route('/pendingRequest').get(adminVerify,getPendingRequest)
 router.route('/updateStatus').post(adminVerify,updatePendingApproval)
+router.route('/totalSalary').get(adminVerify,totalSalary)
+router.route('/updateSalaryStatus').post(adminVerify,updateSalaryStatus)
+router.route('/countSalaryStatus').get(adminVerify,countSalaryStatus)
 router.route('/authenticate').get(adminVerify,getAuthenticate)
 
 module.exports = router

@@ -6,6 +6,8 @@ const gradeData = require('../data/initialGradeData')
 const employeeData = require('../data/initialEmployeeData')
 const jwt = require('jsonwebtoken')
 const userModel = require('../models/userModel')
+const nodemailer = require('nodemailer')
+const bcrypt = require('bcryptjs')
 const JWT_SECRET = process.env.JWT_SECRET
 
 const getEmployeeDetails = async(request,response)=>
@@ -17,10 +19,10 @@ const getEmployeeDetails = async(request,response)=>
         {
             await employeeDetailsModel.insertMany(employeeData)
         }
-        const approvedData = await processModel.find({active : true}).populate({
+        const approvedData = await processModel.find({approvalStatus : "approved",active : true}).populate({
             path:'employeeID',
             model:'employeeDetails',
-            select:'employeeID employeeName role'
+            select:'employeeID employeeName role status'
         }).populate({
             path:'gradeNo',
             model:'employee_grade',
@@ -39,16 +41,62 @@ const postNewEmployee = async(request,response)=>
     const newEmployeeData = request.body.employeeID
     const gradeNo = request.body.gradeNo.gradeNo
     const employeeProcessData = request.body
+    const role = request.body.employeeID.role
+    const transport = nodemailer.createTransport
+    ({
+        service : "gmail",
+        auth: {
+            user : process.env.USER_MAILID,
+            pass : process.env.PASSWORD
+        }
+    })
     try
     {
         const existingEmployee = await employeeDetailsModel.findOne({employeeID : newEmployeeData.employeeID})
         if(!existingEmployee)
         {
+            if(role == 'hr')
+            {
+                try
+                {
+                    const existingUser = await userModel.findOne({ emailID: newEmployeeData.emailID });
+                    if (!existingUser)
+                    {
+                        const user = new userModel({
+                            name: request.body.employeeID.employeeName,
+                            emailID: request.body.employeeID.emailID,
+                            password: request.body.employeeID.employeeName,
+                            role: role
+                        });
+                
+                        console.log(user.password);     
+
+                        const salt = await bcrypt.genSalt(10);
+                        user.password = await bcrypt.hash(user.password, salt); 
+                        
+                        console.log(user.password);
+                        const info = await transport.sendMail({
+                            from: "Sudharsanan",
+                            to: user.emailID,
+                            subject: "Regarding Your Login Details of Employee-Payroll",
+                            text: `Your userID is ${user.emailID}. Your password is set to your username ("${user.name}").`
+                        });
+                
+                        await user.save();
+                        return response.status(200).send({message : "New user created"})
+                    }
+                }
+                catch(error)
+                {
+                    return response.status(500).send({message : error.message})
+                }
+            }
             newEmployeeData.approvalStatus = "approved"
             const newlyAddedData = await employeeDetailsModel.create(newEmployeeData)
             const grade = await gradeModel.findOne({gradeNo:gradeNo, active: true})
             employeeProcessData.employeeID = newlyAddedData._id
             employeeProcessData.gradeNo = grade._id
+            employeeProcessData.approvalStatus = "approved"
             await processModel.create(employeeProcessData);
             return response.status(201).send("The Data added SuccessFully")
         }
@@ -293,7 +341,11 @@ const getAuthenticate = async(request,response)=>
         const userData = await userModel.findOne({emailID : decoded})
         if(userData)
         {
-            return response.status(201).send({message : "Authorized user"})
+            return response.status(201).send({
+                name:userData.name,
+                emailID: userData.emailID,
+                message : "Authorized user"
+            })
         }
     }
     else
@@ -302,6 +354,93 @@ const getAuthenticate = async(request,response)=>
     }
 }
 
+const totalSalary = async(request,response) =>
+{
+    try
+    {
+        const totalSalary = await processModel.aggregate([
+            {
+                $match: { 
+                    approvalStatus: "approved",
+                    active: true 
+                }
+            },
+            {
+                $group: {
+                    _id: "$salaryStatus",
+                    totalSalary: { $sum: "$salary" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    salaryStatus: "$_id",
+                    totalSalary: 1
+                }
+            }
+        ])
+        return response.status(200).send({totalSalary})
+    }
+    catch(error)
+    {
+        return response.status(500).send(error.message);
+    }
+}
 
-module.exports = {getEmployeeDetails,postNewEmployee,getAuthenticate,updateExistingEmployee, calculateAndUpdateSalaries,
-                updatePendingApproval,getPendingRequest,deleteEmployeeData,getGradeData,addNewGrade,updateGrade,getEmployeeCount}
+const updateSalaryStatus = async(request,response) =>
+{
+    const employeeID = request.body.employeeID
+    try
+    {
+        const updatedEmployeeSalaryStatus = await processModel.findOneAndUpdate(
+            {employeeID : employeeID,active:true},
+            {salaryStatus : "paid"},
+            {new : true}
+        )
+        if(updatedEmployeeSalaryStatus != null)
+            return response.status(201).send({message :"The data is updated successfully"})
+        else
+            return response.status(404).send({message : "The Employee Data is not found"})
+
+    }
+    catch(error)
+    {
+        return response.status(500).send(error.messsage)
+    }
+}
+
+const countSalaryStatus = async(request,response) =>
+{
+    try
+    {
+        const count = await processModel.aggregate([
+            {
+                $match: { 
+                    active: true 
+                }
+            },
+            {
+                $group: {
+                    _id: "$salaryStatus",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    salaryStatus: "$_id",
+                    count: 1
+                }
+            }
+        ])
+        return response.status(200).send(count)
+    }
+    catch(error)
+    {
+        return response.status(500).send({message: error.message})
+    }
+}
+
+module.exports = {getEmployeeDetails,postNewEmployee,getAuthenticate,updateExistingEmployee,
+    calculateAndUpdateSalaries,updatePendingApproval,getPendingRequest,deleteEmployeeData,
+    getGradeData,addNewGrade,updateGrade,getEmployeeCount,totalSalary,updateSalaryStatus,countSalaryStatus}
