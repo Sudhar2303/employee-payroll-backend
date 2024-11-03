@@ -44,7 +44,8 @@ const updateExistingEmployee = async(request,response)=>
             {$set : toUpdateEmployeeData})
         const grade = await gradeModel.findOne({gradeNo:toUpdategradeNo, active: true})
         toUpdateEmployeeProcessData.employeeID = toUpdateEmployeeData._id
-        toUpdateEmployeeProcessData.gradeNo = grade._id,
+        toUpdateEmployeeProcessData.gradeNo = grade._id
+        toUpdateEmployeeProcessData.approvalStatus = "pending"
         await processModel.findOneAndUpdate(
             { _id: toUpdateEmployeeProcessData._id },
             { $set: toUpdateEmployeeProcessData }
@@ -140,7 +141,11 @@ const getAuthenticate = async(request,response)=>
             const userData = await userModel.findOne({emailID : decoded})
             if(userData)
             {
-                return response.status(201).send({message : "Authorized user"})
+                return response.status(201).send({
+                    name:userData.name,
+                    emailID: userData.emailID,
+                    message : "Authorized user"
+                })
             }
         }
         else
