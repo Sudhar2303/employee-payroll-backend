@@ -306,8 +306,9 @@ const getEmployeeCount = async(request,response) =>
 {   
     try
     {
-        const totalEmployees = await employeeDetailsModel.countDocuments();
+        const totalEmployees = await employeeDetailsModel.countDocuments({approvalStatus: "approved"});
         const genderCount = await employeeDetailsModel.aggregate([
+            { $match: { approvalStatus: "approved" } },
             {
                 $group: {
                     _id: "$gender",
@@ -409,7 +410,8 @@ const countSalaryStatus = async(request,response) =>
         const count = await processModel.aggregate([
             {
                 $match: { 
-                    active: true 
+                    active: true,
+                    approvalStatus : "approved"
                 }
             },
             {

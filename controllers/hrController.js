@@ -63,6 +63,7 @@ const getDepartmentViceCount = async(request,response) =>
     try
     {
         const departmentEmployeeCount = await employeeDetailsModel.aggregate([
+            { $match: { approvalStatus: "approved" } },
             {
                 $group : {
                     _id : "$role",
@@ -86,6 +87,7 @@ const getAttendenceStatus = async(request,response) =>
     try
     {
         const totalCount = await employeeDetailsModel.aggregate([
+            { $match: { approvalStatus: "approved" } },
             {
                 $group :
                 {
@@ -95,6 +97,7 @@ const getAttendenceStatus = async(request,response) =>
             }
         ])
         const departmentCount = await employeeDetailsModel.aggregate([
+            { $match: { approvalStatus: "approved" } },
             {
                 $group :
                 {
