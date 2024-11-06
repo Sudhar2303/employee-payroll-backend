@@ -158,7 +158,7 @@ const getGradeData = async(request,response) =>
         {
             await gradeModel.insertMany(gradeData)
         } 
-        const activeData = await gradeModel.find({active: true})
+        const activeData = await gradeModel.find({active: true}).sort({ gradeNo: 1 });
         return response.status(201).send(activeData)
     }
     catch(error)
@@ -401,7 +401,7 @@ const totalSalary = async(request,response) =>
             paidSalaryData[0] || { salaryStatus: "paid", totalSalary: 0 },
             pendingSalaryData[0] || { salaryStatus: "pending", totalSalary: 0 }
         ];
-        
+
         return response.status(200).send({totalSalary})
     }
     catch(error)
