@@ -352,27 +352,56 @@ const totalSalary = async(request,response) =>
 {
     try
     {
-        const totalSalary = await processModel.aggregate([
+        const paidSalaryData = await processModel.aggregate([
             {
                 $match: { 
-                    approvalStatus: "approved",
-                    active: true 
+                    approvalStatus: "approved", 
+                    active: true, 
+                    salaryStatus: "paid" 
                 }
             },
             {
                 $group: {
-                    _id: "$salaryStatus",
+                    _id: null,
                     totalSalary: { $sum: "$salary" }
                 }
             },
             {
                 $project: {
                     _id: 0,
-                    salaryStatus: "$_id",
-                    totalSalary: 1
+                    salaryStatus: "paid",
+                    totalSalary: { $ifNull: ["$totalSalary", 0] }
                 }
             }
-        ])
+        ]);
+        const pendingSalaryData = await processModel.aggregate([
+            {
+                $match: { 
+                    approvalStatus: "approved", 
+                    active: true, 
+                    salaryStatus: "pending" 
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSalary: { $sum: "$salary" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    salaryStatus: "pending",
+                    totalSalary: { $ifNull: ["$totalSalary", 0] }
+                }
+            }
+        ]);
+
+        const totalSalary = [
+            paidSalaryData[0] || { salaryStatus: "paid", totalSalary: 0 },
+            pendingSalaryData[0] || { salaryStatus: "pending", totalSalary: 0 }
+        ];
+        
         return response.status(200).send({totalSalary})
     }
     catch(error)
